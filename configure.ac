@@ -22,29 +22,6 @@ AC_CONFIG_HEADERS([config.h])
 # Checks for libraries.
 AC_CHECK_LIB([fcgi], [FCGX_Init],, [AC_MSG_ERROR([FastCGI library is missing])])
 
-# systemd support.
-AC_ARG_WITH([systemd],
-  AS_HELP_STRING([--with-systemd], [support systemd socket activation]),
-  [], [with_systemd=check])
-have_systemd=no
-if test "x$with_systemd" != "xno"; then
-  PKG_CHECK_MODULES(systemd, [libsystemd-daemon],
-    [AC_DEFINE(HAVE_SYSTEMD, 1, [Define if systemd is available])
-    have_systemd=yes],
-  have_systemd=no)
-  if test "x$have_systemd" = xno -a "x$with_systemd" = xyes; then
-    AC_MSG_ERROR([systemd support requested but libraries not found])
-  fi
-fi
-AM_CONDITIONAL(HAVE_SYSTEMD, [test "x$have_systemd" = "xyes"])
-
-AC_ARG_WITH([systemdsystemunitdir],
-        AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
-        [], [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
-if test "x$with_systemdsystemunitdir" != xno -a "x$have_systemd" != xno; then
-        AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
-fi
-
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h],, [AC_MSG_ERROR([fcntl.h header missing])])
 AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h],, [AC_MSG_ERROR([at least one important system header file is missing])])
